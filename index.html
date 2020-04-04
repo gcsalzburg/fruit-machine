@@ -1,0 +1,262 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Fruit Machine</title>
+
+   <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+   <main>
+      <section id="fruit_machine" class="fruit_machine">
+
+         <h1 id="fm_title" class="fm_title">...</h1>
+
+         <div class="gif_positioned background"></div>
+         <div class="gif_positioned pig"></div>
+         <div class="gif_positioned radar"></div>
+         <a id="link_pig" href="#plugin" class="gif_positioned link_pig"></a>
+         <a id="link_start" href="#start" class="gif_positioned link_start"></a>
+
+         <section id="slots" class="slots">
+            <div class="window window_0">
+               <div id="reel_0" class="reel"></div>
+            </div>
+            <div class="window window_1">
+               <div id="reel_1" class="reel"></div>
+            </div>
+            <div class="window window_2">
+               <div id="reel_2" class="reel"></div>
+            </div>
+         </section>
+
+      </section>
+   </main>
+
+   <script>
+
+      // Change defaults below if needed
+      // Images should be in the folder shown, named 0.jpg, 1.jpg, 2.jpg etc...
+      let title = "Fruit Machine";
+      let slot_img_folder = "slot_images/"; // end in a forward slash
+
+      // Common vars
+      const img_height = 171;
+      let total_height = 0;
+      const reels = [
+         {
+            container:  document.getElementById("reel_0"),
+            cover:      'images/letter_d.png',
+            roll_pos:   0
+         },
+         {
+            container:  document.getElementById("reel_1"),
+            cover:      'images/letter_c.png',
+            roll_pos:   0
+         },
+         {
+            container:  document.getElementById("reel_2"),
+            cover:      'images/letter_a.png',
+            roll_pos:   0
+         }
+      ];
+      
+      // Handlers for button pushes
+      document.getElementById("link_pig").onclick = function(e) {
+         e.preventDefault();
+         fruit_machine.classList.toggle("is_pluggedin");
+      };
+      document.getElementById("link_start").onclick = function(e){
+         e.preventDefault();
+         this.blur(); // Remove image background of depressed button
+      }
+
+      // Creates the initial fruit machine setup
+      function create_fruit_machine(){
+
+         // Set title
+         document.getElementById("fm_title").innerHTML = title;
+         
+         // Preload gifs that are not yet shown
+         // TODO
+
+         // Load and display slot images
+         load_images();
+      }
+      
+      create_fruit_machine();
+
+      // Preloads the slot images until it finds no more in folder
+      function load_images(cnt = 0){
+         let fetch_img = new Promise(function(resolve, reject) {
+            let img = new Image();
+            console.log("Loading: "+cnt);
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(cnt);
+            img.src = slot_img_folder + cnt + '.jpg';
+         });
+         fetch_img.then(
+            img => load_images(++cnt),
+            error => display_images(cnt)
+         );
+      }
+
+      // Writes the slot images into the reels
+      function display_images(num_slot_images){
+         total_height = num_slot_images * img_height; // TODO: REMOVE MAGIC NUMBER!!!
+         for (let reel of reels) {
+            for(let i=0; i<num_slot_images; i++){
+               // Add slot images
+               let new_slot = `<span data-index="${i}" style="background-image:url('${slot_img_folder}${i}.jpg"></span>`;
+               reel.container.insertAdjacentHTML("beforeend",new_slot);
+            }
+
+            // Shuffle reels
+            shuffle_nodes(reel.container);
+
+            // Append copy of first node to end of list
+            reel.container.append(reel.container.childNodes[0].cloneNode(true)); 
+
+            // Add cover letter for start
+            reel.container.insertAdjacentHTML("beforeend",`<span class="letter" style="background-image:url('${reel.cover}"></span>`);
+            
+            // Set starting point for rolling
+            reel.roll_pos = -(total_height+img_height);
+            reel.container.style.marginTop = reel.roll_pos+'px';
+         }
+      }
+
+      // Shuffle the order of the child nodes of a selector
+      function shuffle_nodes(parent_selector){
+         for (let i = parent_selector.children.length; i >= 0; i--) {
+            parent_selector.appendChild(parent_selector.children[Math.random() * i | 0]);
+         }
+      }
+
+      // Rolls
+      function roll(){
+
+      }
+
+
+
+   </script>
+</body>
+
+<!--
+<script>
+
+    var folder = "people/";
+    var extension = ".jpg";
+
+    var IMAGE_HEIGHT = 171;
+    var NUM_IMAGES = 0;
+    var TOTAL_HEIGHT;
+
+    var roll_anim; // requestAnimationFrame ID
+
+    var roll_offsets = [0,0,0];
+    var slot_targets = [0,0,0];
+
+    var has_stopped  = [false,false,false];
+    var img_letters = ["d","c","a"];
+    var imgs_to_preload = [];
+
+    // Variables for rolling slots
+    var MAX_VELOCITY = 40; // This is the rolling speed
+    var ACCELERATION = 2; // This is the acceleration (linear acceleration only)
+    var loop_time = 0;
+    var roll_velocity = [0,0,0];
+    var roll_position = [0,0,0];
+    var loops_so_far = [0,0,0];
+    var has_stopped = [false,false,false];
+    var loops_before_stop = [3,3,3];
+
+    $("#roll").click(function(e){
+		e.preventDefault();
+
+		if($(".pig").hasClass("pig_plugged")){
+	 		loop_time = 0;
+		    roll_velocity = [0,0,0];
+			roll_position = [-(TOTAL_HEIGHT+IMAGE_HEIGHT),-(TOTAL_HEIGHT+IMAGE_HEIGHT),-(TOTAL_HEIGHT+IMAGE_HEIGHT)];
+			has_stopped = [false,false,false];
+	    	loops_so_far = [0,0,0];
+			$(".slot_window .slot_reel").css("margin-top",-(TOTAL_HEIGHT+IMAGE_HEIGHT));
+
+			// Determine random targets
+			// TODO: Make sure same target doesn't appear twice
+			for(i=0;i<3;i++){
+				slot_targets[i] = getRandomInt(1,NUM_IMAGES);	// Assign random targets
+				loops_before_stop[i] = getRandomInt(1,1);		// Assign random length of time before it stops
+				console.log(i + ": " + slot_targets[i] + " - " + $("#slot_window_"+i+" .slot_reel IMG:nth-of-type("+(slot_targets[i])+")").data('image-name'));
+			}
+
+			// Get first frame of first animation
+			roll_anim = requestAnimationFrame(gameLoop);
+			$(".pig").addClass("pig_running");
+			$(".radar").addClass("radar_anim");
+		}
+	});
+
+	current_panel = 0;
+	function gameLoop() {
+
+		for(i=0;i<3;i++){
+			// Get the number of the current panel
+			incoming_panel = Math.floor((-roll_position[i])/IMAGE_HEIGHT)+1;
+			// We can get the name of the person on the current panel using the following command:
+			// console.log(incoming_panel + " - " + $("#slot_window_0 .slot_reel IMG:nth-of-type("+incoming_panel+")").data('image-name'));
+
+			if((loops_so_far[i] >= loops_before_stop[i]) && (incoming_panel == slot_targets[i])){
+				// Arrived!
+				// :)
+				// TODO: Make this better!
+				if(!has_stopped[i]){
+					$("#slot_window_"+i+" .slot_reel").animate({"margin-top": (-(incoming_panel-1)*IMAGE_HEIGHT)},200);
+					console.log("Stopping now @: " + i + ": " + incoming_panel + " - " + $("#slot_window_"+i+" .slot_reel IMG:nth-of-type("+incoming_panel+")").data('image-name'));
+
+					has_stopped[i] = true;	
+				}
+			}else{
+				// Do updating
+				if(roll_velocity[i] < MAX_VELOCITY){
+					roll_velocity[i] += ACCELERATION;
+				}
+
+				roll_position[i] += roll_velocity[i];
+				if(roll_position[i] > 0){
+					roll_position[i] = -TOTAL_HEIGHT;
+					loops_so_far[i]++;
+				}
+
+				$("#slot_window_"+i+" .slot_reel").css("margin-top",roll_position[i]);
+
+			}	
+		}
+
+		// If we haven't stopped them all, then loop again!
+		if(!(has_stopped[0] & has_stopped[1] & has_stopped[2])){
+		  	loop_time++;
+		  	roll_anim = requestAnimationFrame(gameLoop);
+		}else{
+			// Remove animation classes
+			$(".pig").removeClass("pig_running");
+			$(".radar").removeClass("radar_anim");
+		}
+	}
+
+
+
+
+	function setRandom(target,min,max){
+		var rand = getRandomInt(1,NUM_IMAGES);
+		slot_targets[i] = rand;
+		return rand;
+	}
+
+</script>-->
+</html>

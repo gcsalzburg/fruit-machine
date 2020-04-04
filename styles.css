@@ -1,0 +1,106 @@
+/* pacifico-regular - latin */
+@font-face {
+   font-family: 'Pacifico';
+   font-style: normal;
+   font-weight: 400;
+   src: local('Pacifico Regular'), local('Pacifico-Regular'),
+      url('fonts/pacifico-v16-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/pacifico-v16-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* Variables */
+:root{
+   --title-colour: rgb(30,30,30);
+   --fm_width: 944px;
+   --fm_height: 880px;
+}
+::-moz-selection, ::selection{color: white; background: var(--title-colour);}
+
+/* Main page layouting */
+html, body{
+   height:100vh;
+   overflow:hidden;
+   margin:0;
+   padding:0;
+   max-height: 100vh;
+}
+main{
+   display:flex;
+   height: 100vh;
+   position: relative;
+   align-items: center;
+   justify-content: center;
+}
+.fruit_machine{
+   position: relative;
+   width: var(--fm_width);
+   height: var(--fm_height);
+}
+
+/* Fruit machine title */
+.fm_title{
+   font-family: 'Pacifico';
+   position: absolute;
+   font-weight: normal;
+   font-size: 62px;
+   left: 8%;
+   bottom: 17%;
+   transform: skew(0,7deg);
+   color: var(--title-colour);
+   z-index: 100;
+   cursor: default;;
+}
+
+
+/* Fruit machine core graphics */
+
+.gif_positioned{
+   position: absolute;
+   background:none no-repeat left top;
+}
+
+.background{z-index:50; left: 0px;   top: 0px;   width:var(--fm_width); height:var(--fm_height);}
+.pig{       z-index:60; left: 11px;  top: 642px; width: 677px;          height: 233px;}
+.radar{     z-index:60; left: 327px; top: 13px;  width: 156px;          height: 157px;}
+.link_pig{  z-index:70; left: 55px;  top: 694px; width: 198px;          height: 174px;}
+.link_start{z-index:70; left: 207px; top: 410px; width: 158px;          height: 119px;}
+
+.background{         background-image:url("images/background.png");      }
+.pig{                background-image:url("images/unplugged.gif");       }
+.is_pluggedin .radar{background-image:url("images/radar.gif");           }
+.is_pluggedin .pig{  background-image:url("images/plugged.gif");         }
+.is_running   .pig{  background-image:url("images/plugged_electric.gif");}
+.link_start:focus{   background:url("images/start_down.jpg");            }
+
+/* Slot windows */
+
+.slots{
+   position:absolute;
+   width: var(--fm_width);
+   height: var(--fm_height);
+   left: 0;
+   top: 0;
+   z-index: 20;
+}
+
+.window{
+   position:absolute;
+   width:128px;
+   height:171px;
+   overflow:hidden;
+}
+.window_0{left:146px; top:193px;}
+.window_1{left:288px; top:193px;}
+.window_2{left:441px; top:199px;}
+
+.reel span{
+   width:128px;
+   height:171px;
+   display:block;
+   background: #FFF no-repeat 50% 50%;
+   background-size: cover;
+   filter: grayscale(100%) contrast(150%);
+}
+.reel span.letter{
+   filter: none;
+}
