@@ -1,6 +1,8 @@
 // Reel object
 class Reel{
 
+   _audio_reel_stop   = new Audio('audio/reel_stop.mp3');
+
    _img_height        = 0;
    _total_height      = 0;
    _num_images        = 0;
@@ -49,6 +51,7 @@ class Reel{
       this._is_rolling = false;
       this._is_ended = true;
       this._velocity = 0;
+      this._audio_reel_stop.play();
    }
 
    is_ended(){

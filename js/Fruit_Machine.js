@@ -3,12 +3,16 @@ class Fruit_Machine{
    _reels = [];
    _last_frame_timestamp = 0; // The last time the loop was run
 
+   _audio_electric = new Audio('audio/electric.mp3');
+   _audio_finish   = new Audio('audio/finish.mp3');
+   _is_rolling = false;
+
    constructor(container, img_folder, duration = 3000) {
       this._fm         = container;
       this._duration   = duration;
       this._img_folder = img_folder;
 
-       // Set title
+      // Set title
       document.getElementById("fm_title").innerHTML = title;
 
       // Create reels
@@ -38,6 +42,7 @@ class Fruit_Machine{
 
       // Start rolling!
       let i=0;
+      this._is_rolling = true;
       for(let reel of this._reels){
          reel.set_target_velocity(speed + Math.random(speed/10) - (speed/5) ); // vary by +/- 5%
 
@@ -47,6 +52,8 @@ class Fruit_Machine{
          },i*200);
          i++;
       }
+      this._audio_electric.loop = true;
+      this._audio_electric.play();
    }
 
    // Endless game loop
@@ -66,12 +73,17 @@ class Fruit_Machine{
    }
 
    _check_if_finished(){
-      let all_finished = true;
-      for (let reel of this._reels) {
-         all_finished &= reel.is_ended();
-      }
-      if(all_finished){
-         this._fm.classList.remove("is_running");
+      if(this._is_rolling){
+         let all_finished = true;
+         for (let reel of this._reels) {
+            all_finished &= reel.is_ended();
+         }
+         if(all_finished){
+            this._fm.classList.remove("is_running");
+            this._audio_electric.pause();
+            this._audio_finish.play();
+            this._is_rolling = false;
+         }
       }
    }
 

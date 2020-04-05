@@ -9,12 +9,12 @@
 <body>
    <main>
       <section id="fruit_machine" class="fruit_machine">
-
          <h1 id="fm_title" class="fm_title">...</h1>
 
          <div class="gif_positioned background"></div>
          <div class="gif_positioned pig"></div>
          <div class="gif_positioned radar"></div>
+         <a id="link_plug" href="#plugin" class="gif_positioned link_plug"></a>
          <a id="link_pig" href="#plugin" class="gif_positioned link_pig"></a>
          <a id="link_start" href="#start" class="gif_positioned link_start"></a>
 
@@ -38,29 +38,45 @@
    <script>
       // Change defaults below if needed
       // Images should be in the sub-folder named, named 0.jpg, 1.jpg, 2.jpg etc...
-      const title = "Fruit Machine";
+      const title = "FruitMachine!";
       const slot_img_folder = "slot_images/"; // end in a forward slash
       const roll_speed = 1.6;
       const roll_duration = 3000; // ms
 
-      // No need to modify below....
-
       // Create fruit machine!
-      let fruit_machine = new Fruit_Machine(document.getElementById("fruit_machine"), slot_img_folder, roll_duration);
-
       const fm = document.getElementById("fruit_machine");
+      let fruit_machine = new Fruit_Machine(fm, slot_img_folder, roll_duration);
+
+      
+      var audio_button = new Audio('audio/button.mp3');
+      var audio_switch = new Audio('audio/switch.mp3');
 
       // Handlers for button pushes
+      document.getElementById("link_plug").onclick = function(e) {
+         e.preventDefault();
+         if(!fm.classList.contains("is_pluggedin")){
+            fm.classList.add("is_pluggedin");
+            audio_switch.fastSeek(0);
+            audio_switch.play();
+         }
+      };
       document.getElementById("link_pig").onclick = function(e) {
          e.preventDefault();
-         fm.classList.toggle("is_pluggedin");
+         if(fm.classList.contains("is_pluggedin")){
+            fm.classList.remove("is_pluggedin");
+            audio_switch.fastSeek(0);
+            audio_switch.play();
+         }
       };
-
+      document.getElementById("link_start").onmousedown = function(e){
+         audio_button.fastSeek(0);
+         audio_button.play();
+      }
       document.getElementById("link_start").onclick = function(e){
          e.preventDefault();
          this.blur(); // Remove image background of depressed button
 
-         if( fm.classList.contains("is_pluggedin") && !fm.classList.contains("is_running")){
+         if(fm.classList.contains("is_pluggedin") && !fm.classList.contains("is_running")){
             fm.classList.add("is_running");
             fruit_machine.roll(roll_speed);
          }
