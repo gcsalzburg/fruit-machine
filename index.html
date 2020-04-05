@@ -47,24 +47,77 @@
       // Common vars
       const img_height = 171;
       let total_height = 0;
-      const reels = [
-         {
-            container:  document.getElementById("reel_0"),
-            cover:      'images/letter_d.png',
-            roll_pos:   0
-         },
-         {
-            container:  document.getElementById("reel_1"),
-            cover:      'images/letter_c.png',
-            roll_pos:   0
-         },
-         {
-            container:  document.getElementById("reel_2"),
-            cover:      'images/letter_a.png',
-            roll_pos:   0
+
+      // Reel object
+      class Reel{
+         constructor(container, cover) {
+            this.container       = container;
+            this.cover           = cover;
+
+            this.velocity        = 0;
+            this.target_velocity = 0;
+            this.acceleration    = 0.02;
+            this.deceleration    = 0.005;
+
+            this.is_rolling      = false;
+            this.start_time      = 0;
          }
+
+         start(){
+            this.is_rolling = true;
+            this.start_time = performance.now();
+         }
+
+         set_target_velocity(v){
+            this.target_velocity = v;
+         }
+
+         update(delta_t){
+            if(this.is_rolling){
+               this.update_velocity();
+               this.update_position(delta_t);
+               this.check_for_end();
+            }
+         }
+
+         update_velocity(){
+            if(this.target_velocity > this.velocity){
+               this.velocity = Math.min(this.target_velocity, this.velocity+this.acceleration);
+            }else if(this.target_velocity < this.velocity){
+               this.velocity = Math.max(this.target_velocity, this.velocity-this.deceleration);
+               if(this.velocity == 0){
+                  this.is_rolling = 0;
+               }
+            }
+         }
+
+         update_position(delta_t){
+            // Calculate new position
+            let new_top = (parseFloat(this.container.style.top) + (this.velocity*delta_t));
+
+            // If we are too close to the top, jump down
+            while(new_top > -img_height){
+               new_top -= (total_height-img_height-img_height);
+            }
+            // Set new position
+            this.container.style.top = new_top+'px';
+         }
+
+         check_for_end(){
+            if(performance.now() > this.start_time+3000){
+               this.target_velocity = 0;
+            }
+         }
+      }
+
+      const reels= [
+         new Reel(document.getElementById("reel_0"), 'images/letter_d.png'),
+         new Reel(document.getElementById("reel_1"), 'images/letter_c.png'),
+         new Reel(document.getElementById("reel_2"), 'images/letter_a.png'),
       ];
       
+      const fruit_machine = document.getElementById("fruit_machine");
+
       // Handlers for button pushes
       document.getElementById("link_pig").onclick = function(e) {
          e.preventDefault();
@@ -73,6 +126,11 @@
       document.getElementById("link_start").onclick = function(e){
          e.preventDefault();
          this.blur(); // Remove image background of depressed button
+
+         if( fruit_machine.classList.contains("is_pluggedin") && !fruit_machine.classList.contains("is_running")){
+            fruit_machine.classList.add("is_running");
+            roll(1);
+         }
       }
 
       // Creates the initial fruit machine setup
@@ -88,13 +146,14 @@
          load_images();
       }
       
+      let last_frame_timestamp = 0; // The last time the loop was run
+      requestAnimationFrame(game_loop);
       create_fruit_machine();
 
       // Preloads the slot images until it finds no more in folder
       function load_images(cnt = 0){
          let fetch_img = new Promise(function(resolve, reject) {
             let img = new Image();
-            console.log("Loading: "+cnt);
             img.onload = () => resolve(img);
             img.onerror = () => reject(cnt);
             img.src = slot_img_folder + cnt + '.jpg';
@@ -107,7 +166,7 @@
 
       // Writes the slot images into the reels
       function display_images(num_slot_images){
-         total_height = num_slot_images * img_height; // TODO: REMOVE MAGIC NUMBER!!!
+         total_height = (num_slot_images+2) * img_height;
          for (let reel of reels) {
             for(let i=0; i<num_slot_images; i++){
                // Add slot images
@@ -116,17 +175,18 @@
             }
 
             // Shuffle reels
-            shuffle_nodes(reel.container);
+            // shuffle_nodes(reel.container);
 
-            // Append copy of first node to end of list
+            // Append copy of first two node to end of list (for smooth scrolling)
             reel.container.append(reel.container.childNodes[0].cloneNode(true)); 
+            reel.container.append(reel.container.childNodes[1].cloneNode(true)); 
 
             // Add cover letter for start
             reel.container.insertAdjacentHTML("beforeend",`<span class="letter" style="background-image:url('${reel.cover}"></span>`);
             
             // Set starting point for rolling
-            reel.roll_pos = -(total_height+img_height);
-            reel.container.style.marginTop = reel.roll_pos+'px';
+            reel.roll_pos = -total_height;
+            reel.container.style.top = reel.roll_pos+'px';
          }
       }
 
@@ -138,11 +198,31 @@
       }
 
       // Rolls
-      function roll(){
+      function roll(speed = 0.8){
+         let i=0;
+         for(let reel of reels){
+            reel.set_target_velocity(speed);
 
+            // Stagger start times
+            setTimeout(function(){
+               reel.start();
+            },i*200);
+            i++;
+         }
       }
 
+      // Endless game loop
+      function game_loop(timestamp) {
 
+         // Update reels
+         for (let reel of reels) {
+            reel.update(timestamp-last_frame_timestamp);
+         }    
+         
+         // Call again
+         last_frame_timestamp = timestamp;
+         requestAnimationFrame(game_loop);
+      }
 
    </script>
 </body>

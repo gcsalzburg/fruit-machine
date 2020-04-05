@@ -93,6 +93,9 @@ main{
 .window_1{left:288px; top:193px;}
 .window_2{left:441px; top:199px;}
 
+.reel{
+   position: relative;
+}
 .reel span{
    width:128px;
    height:171px;
