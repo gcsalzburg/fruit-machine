@@ -1,12 +1,3 @@
-   
-
-function game_loop(timestamp){
-   fruit_machine.draw(timestamp);
-}
-function reel_finished(){
-   fruit_machine.check_finished();
-}
-
 class Fruit_Machine{
 
    _reels = [];
@@ -22,16 +13,20 @@ class Fruit_Machine{
 
       // Create reels
       this._reels = [
-         new Reel(document.getElementById("reel_0"), 'images/arrow.png', this._duration, reel_finished),
-         new Reel(document.getElementById("reel_1"), 'images/arrow.png', this._duration, reel_finished),
-         new Reel(document.getElementById("reel_2"), 'images/arrow.png', this._duration, reel_finished)
+         new Reel(document.getElementById("reel_0"), 'images/arrow.png', this._duration),
+         new Reel(document.getElementById("reel_1"), 'images/arrow.png', this._duration),
+         new Reel(document.getElementById("reel_2"), 'images/arrow.png', this._duration)
       ];
       
       // Load and build slot images
       this._load_images();
+
+      // Bind this for calls
+      // https://cmsdk.com/javascript/39this39-is-undefined-in-class-method-with-requestanimationframe.html
+      this.draw = this.draw.bind(this);
       
       // Start game loop
-      requestAnimationFrame(game_loop);
+      requestAnimationFrame(this.draw);
    }
    
    // Call a new roll
@@ -61,16 +56,19 @@ class Fruit_Machine{
       for (let reel of this._reels) {
          reel.update(timestamp-this._last_frame_timestamp);
       }    
+
+      // Check if finished
+      this._check_if_finished();
       
       // Call again
       this._last_frame_timestamp = timestamp;
-      requestAnimationFrame(game_loop);
+      requestAnimationFrame(this.draw);
    }
 
-   check_finished(){
+   _check_if_finished(){
       let all_finished = true;
       for (let reel of this._reels) {
-         all_finished &= reel.is_rolling();
+         all_finished &= reel.is_ended();
       }
       if(all_finished){
          this._fm.classList.remove("is_running");
@@ -123,19 +121,6 @@ class Fruit_Machine{
          reel.roll_pos = -total_height;
          reel.container.style.top = reel.roll_pos+'px';
       }
-   }
-
-   // Endless game loop
-   _game_loop(timestamp) {
-
-      // Update reels
-      for (let reel of this._reels) {
-         reel.update(timestamp-this._last_frame_timestamp);
-      }    
-      
-      // Call again
-      this._last_frame_timestamp = timestamp;
-      requestAnimationFrame(game_loop);
    }
 
    // Gets a random integer,inclusive of min and max

@@ -10,17 +10,17 @@ class Reel{
    _acceleration      = 0.1;
    
    _is_rolling        = false;
+   _is_ended          = false;
    _start_time        = 0;
    
    _slot_orders       = [];
    _current_slot      = 0;
    _target_slot       = 0;
 
-   constructor(container, cover, duration, finish_callback) {
+   constructor(container, cover, duration) {
       this.container         = container;
       this.cover             = cover;
       this._max_rolling_time = duration;
-      this._callback         = finish_callback;
    }
 
    setup_images(num_images = this._num_images){
@@ -38,19 +38,21 @@ class Reel{
    }
 
    start(target){
+      this._is_ended = false;
       this._is_rolling = true;
       this._target_slot = target;
       this._start_time = performance.now();
+      this.container.classList.remove("shake");
    }
 
    stop(){
       this._is_rolling = false;
+      this._is_ended = true;
       this._velocity = 0;
-      this._callback();
    }
 
-   is_rolling(){
-      return this._is_rolling;
+   is_ended(){
+      return this._is_ended;
    }
 
    set_target_velocity(v){
