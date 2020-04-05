@@ -37,8 +37,10 @@
       </section>
    </main>
 
-   <script>
+   <script src="js/Reel.js"></script>
+   <script src="js/game.js"></script>
 
+   <script>
       // Change defaults below if needed
       // Images should be in the folder shown, named 0.jpg, 1.jpg, 2.jpg etc...
       let title = "Fruit Machine";
@@ -47,73 +49,13 @@
       // Common vars
       const img_height = 171;
       let total_height = 0;
+      let num_images = 0;
 
-      // Reel object
-      class Reel{
-         constructor(container, cover) {
-            this.container       = container;
-            this.cover           = cover;
-
-            this.velocity        = 0;
-            this.target_velocity = 0;
-            this.acceleration    = 0.02;
-            this.deceleration    = 0.005;
-
-            this.is_rolling      = false;
-            this.start_time      = 0;
-         }
-
-         start(){
-            this.is_rolling = true;
-            this.start_time = performance.now();
-         }
-
-         set_target_velocity(v){
-            this.target_velocity = v;
-         }
-
-         update(delta_t){
-            if(this.is_rolling){
-               this.update_velocity();
-               this.update_position(delta_t);
-               this.check_for_end();
-            }
-         }
-
-         update_velocity(){
-            if(this.target_velocity > this.velocity){
-               this.velocity = Math.min(this.target_velocity, this.velocity+this.acceleration);
-            }else if(this.target_velocity < this.velocity){
-               this.velocity = Math.max(this.target_velocity, this.velocity-this.deceleration);
-               if(this.velocity == 0){
-                  this.is_rolling = 0;
-               }
-            }
-         }
-
-         update_position(delta_t){
-            // Calculate new position
-            let new_top = (parseFloat(this.container.style.top) + (this.velocity*delta_t));
-
-            // If we are too close to the top, jump down
-            while(new_top > -img_height){
-               new_top -= (total_height-img_height-img_height);
-            }
-            // Set new position
-            this.container.style.top = new_top+'px';
-         }
-
-         check_for_end(){
-            if(performance.now() > this.start_time+3000){
-               this.target_velocity = 0;
-            }
-         }
-      }
-
+      // Create reels
       const reels= [
-         new Reel(document.getElementById("reel_0"), 'images/letter_d.png'),
-         new Reel(document.getElementById("reel_1"), 'images/letter_c.png'),
-         new Reel(document.getElementById("reel_2"), 'images/letter_a.png'),
+         new Reel(document.getElementById("reel_0"), 'images/arrow.png'),
+         new Reel(document.getElementById("reel_1"), 'images/arrow.png'),
+         new Reel(document.getElementById("reel_2"), 'images/arrow.png'),
       ];
       
       const fruit_machine = document.getElementById("fruit_machine");
@@ -129,214 +71,14 @@
 
          if( fruit_machine.classList.contains("is_pluggedin") && !fruit_machine.classList.contains("is_running")){
             fruit_machine.classList.add("is_running");
-            roll(1);
+            roll(0.8);
          }
-      }
-
-      // Creates the initial fruit machine setup
-      function create_fruit_machine(){
-
-         // Set title
-         document.getElementById("fm_title").innerHTML = title;
-         
-         // Preload gifs that are not yet shown
-         // TODO
-
-         // Load and display slot images
-         load_images();
       }
       
       let last_frame_timestamp = 0; // The last time the loop was run
       requestAnimationFrame(game_loop);
       create_fruit_machine();
-
-      // Preloads the slot images until it finds no more in folder
-      function load_images(cnt = 0){
-         let fetch_img = new Promise(function(resolve, reject) {
-            let img = new Image();
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(cnt);
-            img.src = slot_img_folder + cnt + '.jpg';
-         });
-         fetch_img.then(
-            img => load_images(++cnt),
-            error => display_images(cnt)
-         );
-      }
-
-      // Writes the slot images into the reels
-      function display_images(num_slot_images){
-         total_height = (num_slot_images+2) * img_height;
-         for (let reel of reels) {
-            for(let i=0; i<num_slot_images; i++){
-               // Add slot images
-               let new_slot = `<span data-index="${i}" style="background-image:url('${slot_img_folder}${i}.jpg"></span>`;
-               reel.container.insertAdjacentHTML("beforeend",new_slot);
-            }
-
-            // Shuffle reels
-            // shuffle_nodes(reel.container);
-
-            // Append copy of first two node to end of list (for smooth scrolling)
-            reel.container.append(reel.container.childNodes[0].cloneNode(true)); 
-            reel.container.append(reel.container.childNodes[1].cloneNode(true)); 
-
-            // Add cover letter for start
-            reel.container.insertAdjacentHTML("beforeend",`<span class="letter" style="background-image:url('${reel.cover}"></span>`);
-            
-            // Set starting point for rolling
-            reel.roll_pos = -total_height;
-            reel.container.style.top = reel.roll_pos+'px';
-         }
-      }
-
-      // Shuffle the order of the child nodes of a selector
-      function shuffle_nodes(parent_selector){
-         for (let i = parent_selector.children.length; i >= 0; i--) {
-            parent_selector.appendChild(parent_selector.children[Math.random() * i | 0]);
-         }
-      }
-
-      // Rolls
-      function roll(speed = 0.8){
-         let i=0;
-         for(let reel of reels){
-            reel.set_target_velocity(speed);
-
-            // Stagger start times
-            setTimeout(function(){
-               reel.start();
-            },i*200);
-            i++;
-         }
-      }
-
-      // Endless game loop
-      function game_loop(timestamp) {
-
-         // Update reels
-         for (let reel of reels) {
-            reel.update(timestamp-last_frame_timestamp);
-         }    
-         
-         // Call again
-         last_frame_timestamp = timestamp;
-         requestAnimationFrame(game_loop);
-      }
-
+      
    </script>
 </body>
-
-<!--
-<script>
-
-    var folder = "people/";
-    var extension = ".jpg";
-
-    var IMAGE_HEIGHT = 171;
-    var NUM_IMAGES = 0;
-    var TOTAL_HEIGHT;
-
-    var roll_anim; // requestAnimationFrame ID
-
-    var roll_offsets = [0,0,0];
-    var slot_targets = [0,0,0];
-
-    var has_stopped  = [false,false,false];
-    var img_letters = ["d","c","a"];
-    var imgs_to_preload = [];
-
-    // Variables for rolling slots
-    var MAX_VELOCITY = 40; // This is the rolling speed
-    var ACCELERATION = 2; // This is the acceleration (linear acceleration only)
-    var loop_time = 0;
-    var roll_velocity = [0,0,0];
-    var roll_position = [0,0,0];
-    var loops_so_far = [0,0,0];
-    var has_stopped = [false,false,false];
-    var loops_before_stop = [3,3,3];
-
-    $("#roll").click(function(e){
-		e.preventDefault();
-
-		if($(".pig").hasClass("pig_plugged")){
-	 		loop_time = 0;
-		    roll_velocity = [0,0,0];
-			roll_position = [-(TOTAL_HEIGHT+IMAGE_HEIGHT),-(TOTAL_HEIGHT+IMAGE_HEIGHT),-(TOTAL_HEIGHT+IMAGE_HEIGHT)];
-			has_stopped = [false,false,false];
-	    	loops_so_far = [0,0,0];
-			$(".slot_window .slot_reel").css("margin-top",-(TOTAL_HEIGHT+IMAGE_HEIGHT));
-
-			// Determine random targets
-			// TODO: Make sure same target doesn't appear twice
-			for(i=0;i<3;i++){
-				slot_targets[i] = getRandomInt(1,NUM_IMAGES);	// Assign random targets
-				loops_before_stop[i] = getRandomInt(1,1);		// Assign random length of time before it stops
-				console.log(i + ": " + slot_targets[i] + " - " + $("#slot_window_"+i+" .slot_reel IMG:nth-of-type("+(slot_targets[i])+")").data('image-name'));
-			}
-
-			// Get first frame of first animation
-			roll_anim = requestAnimationFrame(gameLoop);
-			$(".pig").addClass("pig_running");
-			$(".radar").addClass("radar_anim");
-		}
-	});
-
-	current_panel = 0;
-	function gameLoop() {
-
-		for(i=0;i<3;i++){
-			// Get the number of the current panel
-			incoming_panel = Math.floor((-roll_position[i])/IMAGE_HEIGHT)+1;
-			// We can get the name of the person on the current panel using the following command:
-			// console.log(incoming_panel + " - " + $("#slot_window_0 .slot_reel IMG:nth-of-type("+incoming_panel+")").data('image-name'));
-
-			if((loops_so_far[i] >= loops_before_stop[i]) && (incoming_panel == slot_targets[i])){
-				// Arrived!
-				// :)
-				// TODO: Make this better!
-				if(!has_stopped[i]){
-					$("#slot_window_"+i+" .slot_reel").animate({"margin-top": (-(incoming_panel-1)*IMAGE_HEIGHT)},200);
-					console.log("Stopping now @: " + i + ": " + incoming_panel + " - " + $("#slot_window_"+i+" .slot_reel IMG:nth-of-type("+incoming_panel+")").data('image-name'));
-
-					has_stopped[i] = true;	
-				}
-			}else{
-				// Do updating
-				if(roll_velocity[i] < MAX_VELOCITY){
-					roll_velocity[i] += ACCELERATION;
-				}
-
-				roll_position[i] += roll_velocity[i];
-				if(roll_position[i] > 0){
-					roll_position[i] = -TOTAL_HEIGHT;
-					loops_so_far[i]++;
-				}
-
-				$("#slot_window_"+i+" .slot_reel").css("margin-top",roll_position[i]);
-
-			}	
-		}
-
-		// If we haven't stopped them all, then loop again!
-		if(!(has_stopped[0] & has_stopped[1] & has_stopped[2])){
-		  	loop_time++;
-		  	roll_anim = requestAnimationFrame(gameLoop);
-		}else{
-			// Remove animation classes
-			$(".pig").removeClass("pig_running");
-			$(".radar").removeClass("radar_anim");
-		}
-	}
-
-
-
-
-	function setRandom(target,min,max){
-		var rand = getRandomInt(1,NUM_IMAGES);
-		slot_targets[i] = rand;
-		return rand;
-	}
-
-</script>-->
 </html>
