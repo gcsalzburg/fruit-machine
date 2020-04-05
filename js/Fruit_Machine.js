@@ -3,6 +3,9 @@
 function game_loop(timestamp){
    fruit_machine.draw(timestamp);
 }
+function reel_finished(){
+   fruit_machine.check_finished();
+}
 
 class Fruit_Machine{
 
@@ -19,9 +22,9 @@ class Fruit_Machine{
 
       // Create reels
       this._reels = [
-         new Reel(document.getElementById("reel_0"), 'images/arrow.png', this._duration, this.reel_finished),
-         new Reel(document.getElementById("reel_1"), 'images/arrow.png', this._duration, this.reel_finished),
-         new Reel(document.getElementById("reel_2"), 'images/arrow.png', this._duration, this.reel_finished)
+         new Reel(document.getElementById("reel_0"), 'images/arrow.png', this._duration, reel_finished),
+         new Reel(document.getElementById("reel_1"), 'images/arrow.png', this._duration, reel_finished),
+         new Reel(document.getElementById("reel_2"), 'images/arrow.png', this._duration, reel_finished)
       ];
       
       // Load and build slot images
@@ -64,7 +67,7 @@ class Fruit_Machine{
       requestAnimationFrame(game_loop);
    }
 
-   reel_finished(){
+   check_finished(){
       let all_finished = true;
       for (let reel of this._reels) {
          all_finished &= reel.is_rolling();
