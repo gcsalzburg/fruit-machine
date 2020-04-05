@@ -6,17 +6,22 @@ class Reel{
 
       this.velocity          = 0;
       this.target_velocity   = 0;
+
+      this.is_approaching    = false;
       this.approach_velocity = 0.1; // slowly bring the final one into view
-      this.acceleration      = 0.02;
-      this.deceleration      = 0.005;
+      this.approach_flag = false;
+
+      this.acceleration      = 0.1;
+      this.deceleration      = 0.5;
 
       this.is_rolling        = false;
       this.start_time        = 0;
 
       this.slot_orders       = [];
       this.current_slot      = 0;
+      this.target_slot       = 0;
 
-      this.max_rolling_time  = 5000;
+      this.max_rolling_time  = 3000;
    }
 
    save_ordering(){
@@ -25,9 +30,16 @@ class Reel{
       }
    }
 
-   start(){
+   start(target){
       this.is_rolling = true;
+      this.target_slot = target;
       this.start_time = performance.now();
+   }
+
+   stop(){
+      this.is_rolling = false;
+      this.velocity = 0;
+      this.container.classList.add("shake");
    }
 
    set_target_velocity(v){
@@ -38,7 +50,7 @@ class Reel{
       if(this.is_rolling){
          this.update_velocity();
          this.update_position(delta_t);
-         this.check_for_end();
+         this.check_approach();
       }
    }
 
@@ -68,9 +80,11 @@ class Reel{
       this.current_slot = this.slot_orders[Math.floor(-new_top/img_height)%num_images];
    }
 
-   check_for_end(){
-      if(performance.now() > this.start_time+this.max_rolling_time){
-         this.set_target_velocity(this.approach_velocity);
+   check_approach(){
+      if( (performance.now() > this.start_time+this.max_rolling_time) && (this.current_slot == this.target_slot) ){
+         this.stop();
+         const curr_top = parseFloat(this.container.style.top);
+         this.container.style.top = (curr_top - curr_top%img_height) + 'px';
       }
    }
 }
