@@ -1,96 +1,90 @@
 // Reel object
 class Reel{
-   constructor(container, cover, num_images) {
+
+   _img_height        = 0;
+   _total_height      = 0;
+   _num_images        = 0;
+
+   _velocity          = 0;
+   _target_velocity   = 0;
+   _acceleration      = 0.1;
+   
+   _is_rolling        = false;
+   _start_time        = 0;
+   
+   _slot_orders       = [];
+   _current_slot      = 0;
+   _target_slot       = 0;
+
+   constructor(container, cover, duration = 3000, finish_callback) {
       this.container         = container;
       this.cover             = cover;
-      this.num_images        = num_images;
-      
-      this.img_height        = 0;
-      this.total_height      = 0;
-
-      this.velocity          = 0;
-      this.target_velocity   = 0;
-
-      this.is_approaching    = false;
-      this.approach_velocity = 0.1; // slowly bring the final one into view
-      this.approach_flag = false;
-
-      this.acceleration      = 0.1;
-      this.deceleration      = 0.5;
-
-      this.is_rolling        = false;
-      this.start_time        = 0;
-
-      this.slot_orders       = [];
-      this.current_slot      = 0;
-      this.target_slot       = 0;
-
-      this.max_rolling_time  = 3000;
+      this._max_rolling_time = duration;
+      this._callback         = finish_callback;
    }
 
-   save_ordering(){
+   setup_images(num_images = this._num_images){
+      this._num_images   = num_images;
+      this._img_height   = this.container.children[0].clientHeight;
+      this._total_height = (this._num_images+2) * this._img_height;
+      
+      // Now save the ordering as it is
       for(let slot of this.container.children){
-         this.slot_orders.push(slot.dataset.index);
+         this._slot_orders.push(slot.dataset.index);
       }
-      this.img_height = this.container.children[0].clientHeight;
-      this.total_height = (this.num_images+2) * this.img_height;
    }
 
    start(target){
-      this.is_rolling = true;
-      this.target_slot = target;
-      this.start_time = performance.now();
+      this._is_rolling = true;
+      this._target_slot = target;
+      this._start_time = performance.now();
    }
 
    stop(){
-      this.is_rolling = false;
-      this.velocity = 0;
-      this.container.classList.add("shake");
+      this._is_rolling = false;
+      this._velocity = 0;
+      this._callback();
    }
 
    set_target_velocity(v){
-      this.target_velocity = v;
+      this._target_velocity = v;
    }
 
    update(delta_t){
-      if(this.is_rolling){
-         this.update_velocity();
-         this.update_position(delta_t);
-         this.check_approach();
+      if(this._is_rolling){
+         this._update_velocity();
+         this._update_position(delta_t);
+         this._check_approach();
       }
    }
 
-   update_velocity(){
-      if(this.target_velocity > this.velocity){
-         this.velocity = Math.min(this.target_velocity, this.velocity+this.acceleration);
-      }else if(this.target_velocity < this.velocity){
-         this.velocity = Math.max(this.target_velocity, this.velocity-this.deceleration);
-         if(this.velocity == 0){
-            this.is_rolling = 0;
-         }
+   _update_velocity(){
+      if(this._target_velocity > this._velocity){
+         this._velocity = Math.min(this._target_velocity, this._velocity+this._acceleration);
       }
    }
 
-   update_position(delta_t){
+   _update_position(delta_t){
       // Calculate new position
-      let new_top = (parseFloat(this.container.style.top) + (this.velocity*delta_t));
+      let new_top = (parseFloat(this.container.style.top) + (this._velocity*delta_t));
 
       // If we are too close to the top, jump down
-      while(new_top > -this.img_height){
-         new_top -= (this.total_height-this.img_height-this.img_height);
+      while(new_top > -this._img_height){
+         new_top -= (this._total_height-this._img_height-this._img_height);
       }
       // Set new position
       this.container.style.top = new_top+'px';
 
       // Calculate which slot is in view
-      this.current_slot = this.slot_orders[Math.floor(-new_top/this.img_height)%this.num_images];
+      this._current_slot = this._slot_orders[Math.floor(-new_top/this._img_height)%this._num_images];
    }
 
-   check_approach(){
-      if( (performance.now() > this.start_time+this.max_rolling_time) && (this.current_slot == this.target_slot) ){
+   _check_approach(){
+      if( (performance.now() > this._start_time+this._max_rolling_time) && (this._current_slot == this._target_slot) ){
          this.stop();
          const curr_top = parseFloat(this.container.style.top);
-         this.container.style.top = (curr_top - curr_top%this.img_height) + 'px';
+         this.container.style.top = (curr_top - curr_top%this._img_height) + 'px';
+         this.container.classList.add("shake");
       }
    }
 }

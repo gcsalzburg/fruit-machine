@@ -1,16 +1,12 @@
 <!doctype html>
-
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-
-  <title>Fruit Machine</title>
-
+   <meta charset="utf-8">
+   <title>Fruit Machine</title>
    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-
    <main>
       <section id="fruit_machine" class="fruit_machine">
 
@@ -39,46 +35,36 @@
 
    <script src="js/Reel.js"></script>
    <script src="js/game.js"></script>
-
    <script>
       // Change defaults below if needed
-      // Images should be in the folder shown, named 0.jpg, 1.jpg, 2.jpg etc...
-      let title = "Fruit Machine";
-      let slot_img_folder = "slot_images/"; // end in a forward slash
+      // Images should be in the sub-folder named, named 0.jpg, 1.jpg, 2.jpg etc...
+      const title = "Fruit Machine";
+      const slot_img_folder = "slot_images/"; // end in a forward slash
+      const roll_speed = 1.6;
+      const roll_duration = 3000; // ms
 
-      // Common vars
-      const img_height = 171;
-      let total_height = 0;
-      let num_images = 0;
+      // No need to modify below....
 
-      // Create reels
-      const reels= [
-         new Reel(document.getElementById("reel_0"), 'images/arrow.png'),
-         new Reel(document.getElementById("reel_1"), 'images/arrow.png'),
-         new Reel(document.getElementById("reel_2"), 'images/arrow.png'),
-      ];
-      
-      const fruit_machine = document.getElementById("fruit_machine");
+      // Create fruit machine!
+      create_fruit_machine(roll_duration);
+
+      const fm = document.getElementById("fruit_machine");
 
       // Handlers for button pushes
       document.getElementById("link_pig").onclick = function(e) {
          e.preventDefault();
-         fruit_machine.classList.toggle("is_pluggedin");
+         fm.classList.toggle("is_pluggedin");
       };
-      
+
       document.getElementById("link_start").onclick = function(e){
          e.preventDefault();
          this.blur(); // Remove image background of depressed button
 
-         if( fruit_machine.classList.contains("is_pluggedin") && !fruit_machine.classList.contains("is_running")){
-            fruit_machine.classList.add("is_running");
-            roll(1.6);
+         if( fm.classList.contains("is_pluggedin") && !fm.classList.contains("is_running")){
+            fm.classList.add("is_running");
+            roll(roll_speed);
          }
       }
-      
-      let last_frame_timestamp = 0; // The last time the loop was run
-      requestAnimationFrame(game_loop);
-      create_fruit_machine();
 
    </script>
 </body>

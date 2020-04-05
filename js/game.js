@@ -1,14 +1,35 @@
 // Container for the reels
-let reels = [];
+let reels;
+let last_frame_timestamp = 0; // The last time the loop was run
+
+let finished = 0;
+
  
  // Creates the initial fruit machine setup
- function create_fruit_machine(){
+ function create_fruit_machine(game_duration){
 
    // Set title
    document.getElementById("fm_title").innerHTML = title;
+
+   // Create reels
+   reels = [
+      new Reel(document.getElementById("reel_0"), 'images/arrow.png', game_duration, reel_finished),
+      new Reel(document.getElementById("reel_1"), 'images/arrow.png', game_duration, reel_finished),
+      new Reel(document.getElementById("reel_2"), 'images/arrow.png', game_duration, reel_finished)
+   ];
    
-   // Load and display slot images
+   // Start game loop
+   requestAnimationFrame(game_loop);
+
+   // Load and build slot images
    load_images();
+}
+
+function reel_finished(){
+   finished++;
+   if(finished == 3){
+      document.getElementById("fruit_machine").classList.remove("is_running");
+   }
 }
 
 
@@ -29,16 +50,13 @@ function load_images(cnt = 0){
 // Writes the slot images into the reels
 function display_images(num_slot_images){
 
-   // Save top level variable
+   // Calculate reel sizes
    let img_height = 171;
    let num_images = num_slot_images;
    total_height = (num_slot_images+2) * img_height;
 
-   reels.push(new Reel(document.getElementById("reel_0"), 'images/arrow.png', num_images));
-   reels.push(new Reel(document.getElementById("reel_1"), 'images/arrow.png', num_images));
-   reels.push(new Reel(document.getElementById("reel_2"), 'images/arrow.png', num_images));
-
    for (let reel of reels) {
+
       for(let i=0; i<num_slot_images; i++){
          // Add slot images
          let new_slot = `<span data-index="${i}" style="background-image:url('${slot_img_folder}${i}.jpg"></span>`;
@@ -47,7 +65,7 @@ function display_images(num_slot_images){
 
       // Shuffle reels
       shuffle_nodes(reel.container);
-      reel.save_ordering();
+      reel.setup_images(num_images);
 
       // Append copy of first two node to end of list (for smooth scrolling)
       reel.container.append(reel.container.childNodes[0].cloneNode(true)); 
@@ -69,7 +87,7 @@ function shuffle_nodes(parent_selector){
    }
 }
 
-// Rolls
+// Call a new roll
 function roll(speed = 1){
 
    // Select a target
