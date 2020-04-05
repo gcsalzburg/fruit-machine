@@ -4,7 +4,7 @@ Random selection of a friend, colleague or classmate!
 
 > Demo here: https://www.designedbycave.co.uk/fruit-machine/
 
-![Demo gif](https://www.designedbycave.co.uk/fruit-machine/demo_gif.gif)
+<img src="https://www.designedbycave.co.uk/fruit-machine/demo_gif.gif" alt="Demo gif">
 
 ## How to use
 
