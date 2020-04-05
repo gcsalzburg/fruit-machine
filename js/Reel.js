@@ -9,14 +9,14 @@ class Reel{
    _target_velocity   = 0;
    _acceleration      = 0.1;
    
-   _is_rolling        = false;
+   is_rolling        = false;
    _start_time        = 0;
    
    _slot_orders       = [];
    _current_slot      = 0;
    _target_slot       = 0;
 
-   constructor(container, cover, duration = 3000, finish_callback) {
+   constructor(container, cover, duration, finish_callback) {
       this.container         = container;
       this.cover             = cover;
       this._max_rolling_time = duration;
@@ -24,6 +24,9 @@ class Reel{
    }
 
    setup_images(num_images = this._num_images){
+
+      this._shuffle_slots();
+
       this._num_images   = num_images;
       this._img_height   = this.container.children[0].clientHeight;
       this._total_height = (this._num_images+2) * this._img_height;
@@ -44,6 +47,10 @@ class Reel{
       this._is_rolling = false;
       this._velocity = 0;
       this._callback();
+   }
+
+   is_rolling(){
+      return this._is_rolling;
    }
 
    set_target_velocity(v){
@@ -85,6 +92,13 @@ class Reel{
          const curr_top = parseFloat(this.container.style.top);
          this.container.style.top = (curr_top - curr_top%this._img_height) + 'px';
          this.container.classList.add("shake");
+      }
+   }
+
+   // Shuffle the order of the child nodes of a selector
+   _shuffle_slots(){
+      for (let i = this.container.children.length; i >= 0; i--) {
+         this.container.appendChild(this.container.children[Math.random() * i | 0]);
       }
    }
 }

@@ -46,7 +46,7 @@
       // No need to modify below....
 
       // Create fruit machine!
-      create_fruit_machine(roll_duration);
+      let fruit_machine = new Fruit_Machine(document.getElementById("fruit_machine"), slot_img_folder, roll_duration);
 
       const fm = document.getElementById("fruit_machine");
 
@@ -62,7 +62,7 @@
 
          if( fm.classList.contains("is_pluggedin") && !fm.classList.contains("is_running")){
             fm.classList.add("is_running");
-            roll(roll_speed);
+            fruit_machine.roll(roll_speed);
          }
       }
 
