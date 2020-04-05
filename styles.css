@@ -107,3 +107,23 @@ main{
 .reel span.letter{
    filter: none;
 }
+
+.reel.shake{
+   animation: shake_reel 0.3s cubic-bezier(.36,.07,.19,.97) both;
+   backface-visibility: hidden;
+   transform: translate3d(0, 0, 0);
+   perspective: 1000px;
+}
+
+@keyframes shake_reel{
+   10%{ transform: translate3d(0, -12px, 0);}
+   20%{ transform: translate3d(0,  12px, 0);}
+   30%{ transform: translate3d(0, -10px, 0);}
+   40%{ transform: translate3d(0,  10px, 0);}
+   50%{ transform: translate3d(0, -8px, 0);}
+   60%{ transform: translate3d(0,  8px, 0);}
+   70%{ transform: translate3d(0, -4px, 0);}
+   80%{ transform: translate3d(0,  4px, 0);}
+   90%{ transform: translate3d(0, -2px, 0);}
+   100%{transform: translate3d(0,  0px, 0);}
+}
