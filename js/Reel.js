@@ -9,7 +9,7 @@ class Reel{
    _target_velocity   = 0;
    _acceleration      = 0.1;
    
-   is_rolling        = false;
+   _is_rolling        = false;
    _start_time        = 0;
    
    _slot_orders       = [];
