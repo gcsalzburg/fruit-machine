@@ -1,12 +1,12 @@
+// Container for the reels
+let reels = [];
+ 
  // Creates the initial fruit machine setup
  function create_fruit_machine(){
 
    // Set title
    document.getElementById("fm_title").innerHTML = title;
    
-   // Preload gifs that are not yet shown
-   // TODO
-
    // Load and display slot images
    load_images();
 }
@@ -30,8 +30,13 @@ function load_images(cnt = 0){
 function display_images(num_slot_images){
 
    // Save top level variable
-   num_images = num_slot_images;
+   let img_height = 171;
+   let num_images = num_slot_images;
    total_height = (num_slot_images+2) * img_height;
+
+   reels.push(new Reel(document.getElementById("reel_0"), 'images/arrow.png', num_images));
+   reels.push(new Reel(document.getElementById("reel_1"), 'images/arrow.png', num_images));
+   reels.push(new Reel(document.getElementById("reel_2"), 'images/arrow.png', num_images));
 
    for (let reel of reels) {
       for(let i=0; i<num_slot_images; i++){
@@ -68,7 +73,7 @@ function shuffle_nodes(parent_selector){
 function roll(speed = 1){
 
    // Select a target
-   let target = get_random_int(0,num_images-1);
+   let target = get_random_int(0,reels[0].container.children.length-4);
    console.log(target);
 
    // Start rolling!
@@ -97,7 +102,7 @@ function game_loop(timestamp) {
    requestAnimationFrame(game_loop);
 }
 
-// Gets a random integer
+// Gets a random integer,inclusive of min and max
 function get_random_int(min, max) {
    return Math.floor(Math.random() * (max - min + 1)) + min;
 }

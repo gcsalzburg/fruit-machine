@@ -1,8 +1,12 @@
 // Reel object
 class Reel{
-   constructor(container, cover) {
+   constructor(container, cover, num_images) {
       this.container         = container;
       this.cover             = cover;
+      this.num_images        = num_images;
+      
+      this.img_height        = 0;
+      this.total_height      = 0;
 
       this.velocity          = 0;
       this.target_velocity   = 0;
@@ -28,6 +32,8 @@ class Reel{
       for(let slot of this.container.children){
          this.slot_orders.push(slot.dataset.index);
       }
+      this.img_height = this.container.children[0].clientHeight;
+      this.total_height = (this.num_images+2) * this.img_height;
    }
 
    start(target){
@@ -70,21 +76,21 @@ class Reel{
       let new_top = (parseFloat(this.container.style.top) + (this.velocity*delta_t));
 
       // If we are too close to the top, jump down
-      while(new_top > -img_height){
-         new_top -= (total_height-img_height-img_height);
+      while(new_top > -this.img_height){
+         new_top -= (this.total_height-this.img_height-this.img_height);
       }
       // Set new position
       this.container.style.top = new_top+'px';
 
       // Calculate which slot is in view
-      this.current_slot = this.slot_orders[Math.floor(-new_top/img_height)%num_images];
+      this.current_slot = this.slot_orders[Math.floor(-new_top/this.img_height)%this.num_images];
    }
 
    check_approach(){
       if( (performance.now() > this.start_time+this.max_rolling_time) && (this.current_slot == this.target_slot) ){
          this.stop();
          const curr_top = parseFloat(this.container.style.top);
-         this.container.style.top = (curr_top - curr_top%img_height) + 'px';
+         this.container.style.top = (curr_top - curr_top%this.img_height) + 'px';
       }
    }
 }
