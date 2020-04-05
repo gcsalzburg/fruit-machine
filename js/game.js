@@ -65,10 +65,10 @@ function shuffle_nodes(parent_selector){
 }
 
 // Rolls
-function roll(speed = 0.8){
+function roll(speed = 1){
 
    // Select a target
-   let target = get_random_int(0,num_images);
+   let target = get_random_int(0,num_images-1);
    console.log(target);
 
    // Start rolling!
@@ -78,7 +78,7 @@ function roll(speed = 0.8){
 
       // Stagger start times
       setTimeout(function(){
-         reel.start();
+         reel.start(target);
       },i*200);
       i++;
    }
