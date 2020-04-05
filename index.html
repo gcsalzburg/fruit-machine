@@ -65,20 +65,21 @@
          e.preventDefault();
          fruit_machine.classList.toggle("is_pluggedin");
       };
+      
       document.getElementById("link_start").onclick = function(e){
          e.preventDefault();
          this.blur(); // Remove image background of depressed button
 
          if( fruit_machine.classList.contains("is_pluggedin") && !fruit_machine.classList.contains("is_running")){
             fruit_machine.classList.add("is_running");
-            roll(0.8);
+            roll(1.6);
          }
       }
       
       let last_frame_timestamp = 0; // The last time the loop was run
       requestAnimationFrame(game_loop);
       create_fruit_machine();
-      
+
    </script>
 </body>
 </html>
