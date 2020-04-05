@@ -73,7 +73,7 @@ class Fruit_Machine{
          all_finished &= reel.is_rolling();
       }
       if(all_finished){
-         document.getElementById("fruit_machine").classList.remove("is_running");
+         this._fm.classList.remove("is_running");
       }
    }
 
