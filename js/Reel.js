@@ -1,28 +1,29 @@
 // Reel object
 class Reel{
 
-   _audio_reel_stop   = new Audio('audio/reel_stop.mp3');
-
-   _img_height        = 0;
-   _total_height      = 0;
-   _num_images        = 0;
-
-   _velocity          = 0;
-   _target_velocity   = 0;
-   _acceleration      = 0.1;
-   
-   _is_rolling        = false;
-   _is_ended          = false;
-   _start_time        = 0;
-   
-   _slot_orders       = [];
-   _current_slot      = 0;
-   _target_slot       = 0;
-
    constructor(container, cover, duration) {
+
+		this._img_height        = 0;
+		this._total_height      = 0;
+		this._num_images        = 0;
+	
+		this._velocity          = 0;
+		this._target_velocity   = 0;
+		this._acceleration      = 0.1;
+		
+		this._is_rolling        = false;
+		this._is_ended          = false;
+		this._start_time        = 0;
+		
+		this._slot_orders       = [];
+		this._current_slot      = 0;
+		this._target_slot       = 0;
+
       this.container         = container;
       this.cover             = cover;
-      this._max_rolling_time = duration;
+		this._max_rolling_time = duration;
+		
+		this._audio_reel_stop   = new Audio('audio/reel_stop.mp3');
    }
 
    setup_images(num_images = this._num_images){
