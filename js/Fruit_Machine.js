@@ -1,16 +1,18 @@
 class Fruit_Machine{
 
-   _reels = [];
-   _last_frame_timestamp = 0; // The last time the loop was run
-
-   _audio_electric = new Audio('audio/electric.mp3');
-   _audio_finish   = new Audio('audio/finish.mp3');
-   _is_rolling = false;
 
    constructor(container, img_folder, duration = 3000) {
       this._fm         = container;
       this._duration   = duration;
-      this._img_folder = img_folder;
+		this._img_folder = img_folder;
+		
+		this._reels = [];
+		this._last_frame_timestamp = 0; // The last time the loop was run
+	
+		this._is_rolling = false;
+		
+		this._audio_electric = new Audio('audio/electric.mp3');
+		this._audio_finish   = new Audio('audio/finish.mp3');
 
       // Set title
       document.getElementById("fm_title").innerHTML = title;

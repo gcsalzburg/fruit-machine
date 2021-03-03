@@ -56,7 +56,7 @@
          e.preventDefault();
          if(!fm.classList.contains("is_pluggedin")){
             fm.classList.add("is_pluggedin");
-            audio_switch.fastSeek(0);
+            audio_switch.currentTime = 0;
             audio_switch.play();
          }
       };
@@ -64,12 +64,12 @@
          e.preventDefault();
          if(fm.classList.contains("is_pluggedin")){
             fm.classList.remove("is_pluggedin");
-            audio_switch.fastSeek(0);
+            audio_switch.currentTime = 0;
             audio_switch.play();
          }
       };
       document.getElementById("link_start").onmousedown = function(e){
-         audio_button.fastSeek(0);
+         audio_button.currentTime = 0;
          audio_button.play();
       }
       document.getElementById("link_start").onclick = function(e){
