@@ -20,3 +20,5 @@ Random selection of a friend, colleague or classmate!
    ```
 
 Dependencies = **NONE**
+
+:)
