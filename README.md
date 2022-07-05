@@ -2,9 +2,9 @@
 
 Random selection of a friend, colleague or classmate!
 
-> Demo here: https://www.designedbycave.co.uk/fruit-machine/
+> Demo here: https://play.interactionmagic.com/fruit-machine/
 
-![Demo gif](https://www.designedbycave.co.uk/fruit-machine/demo_gif.gif)
+![Demo gif](https://play.interactionmagic.com/fruit-machine/demo_gif.gif)
 
 ## How to use
 
